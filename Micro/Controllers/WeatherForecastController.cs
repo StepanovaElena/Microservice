@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Micro.Controllers
 {
-    [Route("api/temperature")]
+    [Route("api/weather-forecast")]
     [ApiController]
-    public class TemperatureController : Controller
+    public class WeatherForecastController : Controller
     {
         private readonly ValuesHolder holder;
 
-        public TemperatureController(ValuesHolder holder)
+        public WeatherForecastController(ValuesHolder holder)
         {
             this.holder = holder;
         }
@@ -28,14 +28,27 @@ namespace Micro.Controllers
         [HttpGet("read")]
         public IActionResult Read([FromQuery] DateTime? dateFrom, [FromQuery] DateTime? dateTo)
         {
-            var isDateRange = dateFrom.ToString().Length > 0 && dateTo.ToString().Length > 0;
+            var isDateRange = dateFrom.HasValue && dateTo.HasValue;
+            var values = holder.Values;
 
             if (isDateRange && dateTo < dateFrom)
             {
                 return BadRequest();
             }
 
-            var values = isDateRange ? holder.Values.Where(v => v.Date > dateFrom && v.Date < dateTo) : holder.Values;
+            if (dateFrom.HasValue && !dateTo.HasValue)
+            {
+                values = values.Where(v => v.Date >= dateFrom).ToList();
+            } 
+            else if (!dateFrom.HasValue && dateTo.HasValue)
+            {
+                values = values.Where(v => v.Date <= dateTo).ToList();
+            }
+            else if (isDateRange)
+            {
+                values = holder.Values.Where(v => v.Date >= dateFrom && v.Date <= dateTo).ToList();
+            }
+           
             return Ok(values);
         }
 
@@ -50,23 +63,18 @@ namespace Micro.Controllers
 
             return Ok();
         }
-
-        [HttpDelete("delete")]
-        public IActionResult Delete([FromQuery] DateTime date)
-        {
-            holder.Values = holder.Values.Where(v => v.Date != date).ToList();
-            return Ok();
-        }
-
+       
         [HttpDelete("delete/range")]
-        public IActionResult DeleteRange([FromQuery] DateTime dateFrom, DateTime dateTo)
+        public IActionResult DeleteRange([FromQuery] DateTime? dateFrom, [FromQuery] DateTime? dateTo)
         {
-            if (dateTo < dateFrom)
+            var isDateRange = dateFrom.HasValue && dateTo.HasValue;
+
+            if (isDateRange && dateTo < dateFrom)
             {
                 return BadRequest();
             }
 
-            holder.Values.RemoveAll(v => v.Date > dateFrom && v.Date < dateTo);
+            holder.Values.RemoveAll(v => v.Date >= dateFrom && v.Date <= dateTo);
             return Ok();
         }
     }
