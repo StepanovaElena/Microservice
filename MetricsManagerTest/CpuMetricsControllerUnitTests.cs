@@ -1,6 +1,8 @@
 using MetricsManager.Controllers;
 using MetricsManager.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using Xunit;
 
@@ -9,10 +11,12 @@ namespace MetricsManagerTest
     public class CpuMetricsControllerUnitTests
     {
         private CpuMetricsController controller;
+        private Mock<ILogger<CpuMetricsController>> mockLogger;
 
         public CpuMetricsControllerUnitTests()
         {
-            controller = new CpuMetricsController();
+            mockLogger = new Mock<ILogger<CpuMetricsController>>();
+            controller = new CpuMetricsController(mockLogger.Object);
         }
 
         [Fact]

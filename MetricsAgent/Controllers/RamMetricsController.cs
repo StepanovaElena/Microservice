@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MetricsAgent.DAL;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +12,21 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class RamMetricsController : Controller
     {
+        private readonly ILogger<RamMetricsController> _logger;
+        private readonly IRamMetricsRepository _repository;
+
+        public RamMetricsController(ILogger<RamMetricsController> logger, IRamMetricsRepository repository)
+        {
+            _repository = repository;
+            _logger = logger;
+            _logger.LogInformation("NLog встроен в RamMetricsController");
+        }
+
         [HttpGet("available")]
         public IActionResult GetAvailableRam()
         {
+            _logger.LogInformation("NetworkMetricsController вызов метода GetAvailableRam");
+
             return Ok();
         }
     }

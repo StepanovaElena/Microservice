@@ -5,16 +5,20 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using MetricsManager.Controllers;
 using MetricsManager.Enums;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace MetricsAgentTest
 {
     public class RamMetricsControllerUnitTest
     {
         private RamMetricsController controller;
+        private Mock<ILogger<RamMetricsController>> mockLogger;
 
         public RamMetricsControllerUnitTest()
         {
-            controller = new RamMetricsController();
+            mockLogger = new Mock<ILogger<RamMetricsController>>();
+            controller = new RamMetricsController(mockLogger.Object);
         }
 
         [Fact]

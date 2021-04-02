@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MetricsAgent.DAL;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +12,22 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class HddMetricsController : Controller
     {
+        private readonly ILogger<HddMetricsController> _logger;
+        private readonly IHddMetricsRepository _repository;
+
+        public HddMetricsController(ILogger<HddMetricsController> logger, IHddMetricsRepository repository)
+        {
+            _repository = repository;
+            _logger = logger;
+            _logger.LogInformation("NLog встроен в HddMetricsController");
+        }
+
+
         [HttpGet("left")]
         public IActionResult GetSpaceLeft()
         {
+            _logger.LogInformation("HddNetMetricsController вызов метода GetSpaceLeft");
+
             return Ok();
         }
     }

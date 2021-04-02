@@ -7,8 +7,8 @@ namespace MetricsManager.Dto
 {
     public class AgentInfo
     {
-        public int AgentId { get; }
+        public int AgentId { get; set; }
 
-        public Uri AgentAddress { get; }
+        public Uri AgentAddress { get; set; }
     }
 }

@@ -5,16 +5,20 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using MetricsManager.Enums;
 using MetricsManager.Controllers;
+using Moq;
+using Microsoft.Extensions.Logging;
 
 namespace MetricsAgentTest
 {
     public class DotNetMetricsControllerUnitTest
     {
         private DotNetMetricsController controller;
+        private Mock<ILogger<DotNetMetricsController>> mockLogger;
 
         public DotNetMetricsControllerUnitTest()
         {
-            controller = new DotNetMetricsController();
+            mockLogger = new Mock<ILogger<DotNetMetricsController>>();
+            controller = new DotNetMetricsController(mockLogger.Object);
         }
 
         [Fact]
