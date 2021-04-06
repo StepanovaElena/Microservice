@@ -13,7 +13,7 @@ namespace MetricsAgent.Responses
     public class NetworkMetricDto
     {
         public int Id { get; set; }
-        public TimeSpan Time { get; set; }
+        public DateTimeOffset Time { get; set; }
         public int Value { get; set; }
         
     }

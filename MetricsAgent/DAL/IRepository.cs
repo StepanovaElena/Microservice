@@ -9,7 +9,7 @@ namespace MetricsAgent.DAL
     {
         IList<T> GetAll();
 
-        IList<T> GetInTimePeriod(TimeSpan timeFrom, TimeSpan timeTo);
+        IList<T> GetInTimePeriod(DateTimeOffset timeFrom, DateTimeOffset timeTo);
 
         T GetById(int id);
 

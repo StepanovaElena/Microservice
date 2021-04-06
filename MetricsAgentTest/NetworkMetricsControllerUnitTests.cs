@@ -11,13 +11,13 @@ using Xunit;
 
 namespace MetricsAgentTest
 {
-    public class NetworkMetricsControllerUnitTest
+    public class NetworkMetricsControllerUnitTests
     {
         private Mock<ILogger<NetworkMetricsController>> mockLogger;
         private Mock<INetworkMetricsRepository> mockRepository;
         private NetworkMetricsController controller;
 
-        public NetworkMetricsControllerUnitTest()
+        public NetworkMetricsControllerUnitTests()
         {
             mockRepository = new Mock<INetworkMetricsRepository>();
             mockLogger = new Mock<ILogger<NetworkMetricsController>>();
@@ -28,8 +28,8 @@ namespace MetricsAgentTest
         public void GetMetrics_ReturnsOk()
         {
             //Arrange
-            var fromTime = TimeSpan.FromSeconds(0);
-            var toTime = TimeSpan.FromSeconds(100);
+            var fromTime = DateTimeOffset.MinValue;
+            var toTime = DateTimeOffset.Now;
 
             //Act
             var result = controller.GetMetrics(fromTime, toTime);
@@ -41,8 +41,8 @@ namespace MetricsAgentTest
         [Fact]
         public void GetMetrics_ShouldCall_GetInTimePeriod_From_Repository()
         {
-            var fromTime = TimeSpan.FromSeconds(0);
-            var toTime = TimeSpan.FromSeconds(100);
+            var fromTime = DateTimeOffset.MinValue;
+            var toTime = DateTimeOffset.Now;
 
             // Arrange
             mockRepository.Setup(repository => repository.GetInTimePeriod(fromTime, toTime)).Returns(new List<NetworkMetric>());

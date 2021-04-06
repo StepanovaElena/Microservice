@@ -10,13 +10,13 @@ using Xunit;
 
 namespace MetricsAgentTest
 {
-    public class RamMetricsControllerUnitTest
+    public class RamMetricsControllerUnitTests
     {
         private Mock<ILogger<RamMetricsController>> mockLogger;
         private Mock<IRamMetricsRepository> mockRepository;
         private RamMetricsController controller;
 
-        public RamMetricsControllerUnitTest()
+        public RamMetricsControllerUnitTests()
         {
             mockRepository = new Mock<IRamMetricsRepository>();
             mockLogger = new Mock<ILogger<RamMetricsController>>();

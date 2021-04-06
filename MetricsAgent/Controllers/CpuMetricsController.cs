@@ -22,17 +22,17 @@ namespace MetricsAgent.Controllers
         {
             _repository = repository;
             _logger = logger;
-            _logger.LogInformation("NLog встроен в CpuMetricsController");
+            _logger.LogInformation("CpuMetricsController ");
         }
 
         [HttpPost("create")]
         public IActionResult Create([FromBody] CpuMetricCreateRequest request)
         {
-            _logger.LogInformation("CpuMetricsController вызов метода Create");
+            _logger.LogDebug($"Create : request = {request}");
 
             _repository.Create(new CpuMetric
             {
-                Time = new TimeSpan(request.Time),
+                Time = request.Time.ToUnixTimeSeconds(),
                 Value = request.Value
             });
 
@@ -42,7 +42,7 @@ namespace MetricsAgent.Controllers
         [HttpGet("all")]
         public IActionResult GetAll()
         {
-            _logger.LogInformation("CpuMetricsController вызов метода GetAll");
+            _logger.LogDebug("GetAll : без параметров" );
 
             var metrics = _repository.GetAll();
 
@@ -53,16 +53,20 @@ namespace MetricsAgent.Controllers
 
             foreach (var metric in metrics)
             {
-                response.Metrics.Add(new CpuMetricDto { Time = metric.Time, Value = metric.Value, Id = metric.Id });
+                response.Metrics.Add(new CpuMetricDto { 
+                    Time = DateTimeOffset.FromUnixTimeSeconds(metric.Time), 
+                    Value = metric.Value, 
+                    Id = metric.Id 
+                });
             }
 
             return Ok(response);
         }
 
         [HttpGet("from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+        public IActionResult GetMetrics([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
-            _logger.LogInformation("CpuMetricsController вызов метода GetMetrics");
+            _logger.LogDebug($"GetMetrics : fromTime = {fromTime}; toTime = {toTime}");
 
             var metrics = _repository.GetInTimePeriod(fromTime, toTime);
 
@@ -73,16 +77,19 @@ namespace MetricsAgent.Controllers
 
             foreach (var metric in metrics)
             {
-                response.Metrics.Add(new CpuMetricDto { Time = metric.Time, Value = metric.Value, Id = metric.Id });
+                response.Metrics.Add(new CpuMetricDto { 
+                    Time = DateTimeOffset.FromUnixTimeSeconds(metric.Time), 
+                    Value = metric.Value, 
+                    Id = metric.Id });
             }
 
             return Ok(response);
         }
 
         [HttpGet("from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
-        public IActionResult GetMetricsByPercentile([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime, [FromRoute] Percentile percentile)
+        public IActionResult GetMetricsByPercentile([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime, [FromRoute] Percentile percentile)
         {
-            _logger.LogInformation("CpuMetricsController вызов метода GetMetricsByPercentile");
+            _logger.LogDebug($"GetMetricsByPercentile : fromTime = {fromTime}; toTime = {toTime}; percentile = {percentile}");
 
             return Ok();
         }

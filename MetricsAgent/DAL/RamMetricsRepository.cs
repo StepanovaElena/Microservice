@@ -29,7 +29,7 @@ namespace MetricsAgent.DAL
             };
 
             cmd.Parameters.AddWithValue("@value", item.Value);
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+            cmd.Parameters.AddWithValue("@time", item.Time);
             cmd.Prepare();
             cmd.ExecuteNonQuery();
         }
@@ -54,7 +54,7 @@ namespace MetricsAgent.DAL
             };
             cmd.Parameters.AddWithValue("@id", item.Id);
             cmd.Parameters.AddWithValue("@value", item.Value);
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+            cmd.Parameters.AddWithValue("@time", item.Time);
             cmd.Prepare();
 
             cmd.ExecuteNonQuery();
@@ -77,7 +77,7 @@ namespace MetricsAgent.DAL
                     {
                         Id = reader.GetInt32(0),
                         Value = reader.GetInt32(0),
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(0))
+                        Time = reader.GetInt64(0)
                     });
                 }
             }
@@ -99,7 +99,7 @@ namespace MetricsAgent.DAL
                 {
                     Id = reader.GetInt32(0),
                     Value = reader.GetInt32(0),
-                    Time = TimeSpan.FromSeconds(reader.GetInt32(0))
+                    Time = reader.GetInt64(0)
                 };
             }
             else
@@ -108,7 +108,7 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public IList<RamMetric> GetInTimePeriod(TimeSpan timeFrom, TimeSpan timeTo)
+        public IList<RamMetric> GetInTimePeriod(DateTimeOffset timeFrom, DateTimeOffset timeTo)
         {
             throw new NotImplementedException();
         }

@@ -26,7 +26,7 @@ namespace MetricsAgent.Controllers
         [HttpGet("left")]
         public IActionResult GetSpaceLeft()
         {
-            _logger.LogInformation("HddNetMetricsController вызов метода GetSpaceLeft");
+            _logger.LogDebug("GetSpaceLeft : без параметров");
 
             return Ok();
         }

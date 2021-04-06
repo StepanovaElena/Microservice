@@ -10,13 +10,13 @@ using Xunit;
 
 namespace MetricsAgentTest
 {
-    public class HddMetricsControllerUnitTest
+    public class HddMetricsControllerUnitTests
     {
         private Mock<ILogger<HddMetricsController>> mockLogger;
         private Mock<IHddMetricsRepository> mockRepository;
         private HddMetricsController controller;
 
-        public HddMetricsControllerUnitTest()
+        public HddMetricsControllerUnitTests()
         {
             mockRepository = new Mock<IHddMetricsRepository>();
             mockLogger = new Mock<ILogger<HddMetricsController>>();

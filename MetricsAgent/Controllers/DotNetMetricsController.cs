@@ -24,9 +24,9 @@ namespace MetricsAgent.Controllers
         }
 
         [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetErrorsCount([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+        public IActionResult GetErrorsCount([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
-            _logger.LogInformation("DotNetMetricsController вызов метода GetErrorsCount");
+            _logger.LogDebug($"GetMetricsByPercentile : fromTime = {fromTime}; toTime = {toTime}");
 
             var metrics = _repository.GetInTimePeriod(fromTime, toTime);
 

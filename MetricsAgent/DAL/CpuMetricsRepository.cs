@@ -39,7 +39,7 @@ namespace MetricsAgent.DAL
 
             // в таблице будем хранить время в секундах, потому преобразуем перед записью в секунды
             // через свойство
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+            cmd.Parameters.AddWithValue("@time", item.Time);
             // подготовка команды к выполнению
             cmd.Prepare();
 
@@ -69,7 +69,7 @@ namespace MetricsAgent.DAL
             };
             cmd.Parameters.AddWithValue("@id", item.Id);
             cmd.Parameters.AddWithValue("@value", item.Value);
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+            cmd.Parameters.AddWithValue("@time", item.Time);
             cmd.Prepare();
 
             cmd.ExecuteNonQuery();
@@ -96,7 +96,7 @@ namespace MetricsAgent.DAL
                         Id = reader.GetInt32(0),
                         Value = reader.GetInt32(0),
                         // налету преобразуем прочитанные секунды в метку времени
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(0))
+                        Time = reader.GetInt64(0)
                     });
                 }
             }
@@ -120,7 +120,7 @@ namespace MetricsAgent.DAL
                 {
                     Id = reader.GetInt32(0),
                     Value = reader.GetInt32(0),
-                    Time = TimeSpan.FromSeconds(reader.GetInt32(0))
+                    Time = reader.GetInt64(0)
                 };
             }
             else
@@ -130,15 +130,15 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public IList<CpuMetric> GetInTimePeriod(TimeSpan timeStart, TimeSpan timeEnd)
+        public IList<CpuMetric> GetInTimePeriod(DateTimeOffset timeStart, DateTimeOffset timeEnd)
         {
             using var cmd = new SQLiteCommand(connection)
             {
                 // прописываем в команду SQL запрос на получение всех данных из таблицы
                 CommandText = "SELECT * FROM cpumetrics WHERE time <= @timeEnd AND time >= @timeStart"
             };
-            cmd.Parameters.AddWithValue("@timeStart", timeStart.TotalSeconds);
-            cmd.Parameters.AddWithValue("@timeEnd", timeEnd.TotalSeconds);
+            cmd.Parameters.AddWithValue("@timeStart", timeStart.ToUnixTimeSeconds());
+            cmd.Parameters.AddWithValue("@timeEnd", timeEnd.ToUnixTimeSeconds());
 
             var returnList = new List<CpuMetric>();
 
@@ -153,7 +153,7 @@ namespace MetricsAgent.DAL
                         Id = reader.GetInt32(0),
                         Value = reader.GetInt32(0),
                         // налету преобразуем прочитанные секунды в метку времени
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(0))
+                        Time = reader.GetInt64(0)
                     });
                 }
             }

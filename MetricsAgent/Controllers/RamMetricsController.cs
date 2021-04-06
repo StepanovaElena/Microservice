@@ -25,7 +25,7 @@ namespace MetricsAgent.Controllers
         [HttpGet("available")]
         public IActionResult GetAvailableRam()
         {
-            _logger.LogInformation("NetworkMetricsController вызов метода GetAvailableRam");
+            _logger.LogDebug("GetAvailableRam : без параметров");
 
             return Ok();
         }

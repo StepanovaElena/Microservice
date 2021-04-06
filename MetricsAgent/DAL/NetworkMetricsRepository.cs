@@ -29,7 +29,7 @@ namespace MetricsAgent.DAL
             };
 
             cmd.Parameters.AddWithValue("@value", item.Value);
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+            cmd.Parameters.AddWithValue("@time", item.Time);
             cmd.Prepare();
             cmd.ExecuteNonQuery();
         }
@@ -54,7 +54,7 @@ namespace MetricsAgent.DAL
             };
             cmd.Parameters.AddWithValue("@id", item.Id);
             cmd.Parameters.AddWithValue("@value", item.Value);
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+            cmd.Parameters.AddWithValue("@time", item.Time);
             cmd.Prepare();
 
             cmd.ExecuteNonQuery();
@@ -77,7 +77,7 @@ namespace MetricsAgent.DAL
                     {
                         Id = reader.GetInt32(0),
                         Value = reader.GetInt32(0),
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(0))
+                        Time = reader.GetInt64(0)
                     });
                 }
             }
@@ -99,7 +99,7 @@ namespace MetricsAgent.DAL
                 {
                     Id = reader.GetInt32(0),
                     Value = reader.GetInt32(0),
-                    Time = TimeSpan.FromSeconds(reader.GetInt32(0))
+                    Time = reader.GetInt64(0)
                 };
             }
             else
@@ -108,14 +108,14 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public IList<NetworkMetric> GetInTimePeriod(TimeSpan timeStart, TimeSpan timeEnd)
+        public IList<NetworkMetric> GetInTimePeriod(DateTimeOffset timeStart, DateTimeOffset timeEnd)
         {
             using var cmd = new SQLiteCommand(connection)
             {
                 CommandText = "SELECT * FROM networkmetrics WHERE time <= @timeEnd AND time >= @timeStart"
             };
-            cmd.Parameters.AddWithValue("@timeStart", timeStart.TotalSeconds);
-            cmd.Parameters.AddWithValue("@timeEnd", timeEnd.TotalSeconds);
+            cmd.Parameters.AddWithValue("@timeStart", timeStart.ToUnixTimeSeconds());
+            cmd.Parameters.AddWithValue("@timeEnd", timeEnd.ToUnixTimeSeconds());
 
             var returnList = new List<NetworkMetric>();
 
@@ -127,7 +127,7 @@ namespace MetricsAgent.DAL
                     {
                         Id = reader.GetInt32(0),
                         Value = reader.GetInt32(0),
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(0))
+                        Time = reader.GetInt64(0) 
                     });
                 }
             }
