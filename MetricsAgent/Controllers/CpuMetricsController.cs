@@ -1,5 +1,6 @@
-﻿using MetricsAgent.DAL;
-using MetricsAgent.Entities;
+﻿using AutoMapper;
+using MetricsAgent.DAL;
+using MetricsAgent.Models;
 using MetricsAgent.Requests;
 using MetricsAgent.Responses;
 using MetricsManager.Enums;
@@ -17,11 +18,14 @@ namespace MetricsAgent.Controllers
     {
         private readonly ILogger<CpuMetricsController> _logger;
         private readonly ICpuMetricsRepository _repository;
+        private readonly IMapper _mapper;
 
-        public CpuMetricsController(ILogger<CpuMetricsController> logger, ICpuMetricsRepository repository)
+        public CpuMetricsController(ILogger<CpuMetricsController> logger, ICpuMetricsRepository repository, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
+
             _logger.LogInformation("CpuMetricsController ");
         }
 
@@ -77,12 +81,9 @@ namespace MetricsAgent.Controllers
 
             foreach (var metric in metrics)
             {
-                response.Metrics.Add(new CpuMetricDto { 
-                    Time = DateTimeOffset.FromUnixTimeSeconds(metric.Time), 
-                    Value = metric.Value, 
-                    Id = metric.Id });
+                response.Metrics.Add(_mapper.Map<CpuMetricDto>(metric));
             }
-
+                     
             return Ok(response);
         }
 

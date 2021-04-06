@@ -1,4 +1,5 @@
-﻿using MetricsAgent.DAL;
+﻿using AutoMapper;
+using MetricsAgent.DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,12 +14,14 @@ namespace MetricsAgent.Controllers
     public class HddMetricsController : Controller
     {
         private readonly ILogger<HddMetricsController> _logger;
+        private readonly IMapper _mapper;
         private readonly IHddMetricsRepository _repository;
 
-        public HddMetricsController(ILogger<HddMetricsController> logger, IHddMetricsRepository repository)
+        public HddMetricsController(ILogger<HddMetricsController> logger, IHddMetricsRepository repository, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
             _logger.LogInformation("NLog встроен в HddMetricsController");
         }
 

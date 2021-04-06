@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace MetricsAgent.Entities
+namespace MetricsAgent.Models
 {
-    public class CpuMetric
+    public class DotNetMetric
     {
         public int Id { get; set; }
 

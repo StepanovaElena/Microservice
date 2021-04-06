@@ -1,6 +1,9 @@
+using AutoMapper;
+using MetricsAgent;
 using MetricsAgent.Controllers;
 using MetricsAgent.DAL;
 using MetricsAgent.Entities;
+using MetricsAgent.Models;
 using MetricsAgent.Responses;
 using MetricsManager.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -17,12 +20,14 @@ namespace MetricsAgentTest
         private Mock<ILogger<CpuMetricsController>> mockLogger;
         private Mock<ICpuMetricsRepository> mockRepository;
         private CpuMetricsController controller;
+        private Mapper mapper;
 
         public CpuMetricsControllerUnitTests()
         {
             mockRepository = new Mock<ICpuMetricsRepository>();
             mockLogger = new Mock<ILogger<CpuMetricsController>>();
-            controller = new CpuMetricsController(mockLogger.Object, mockRepository.Object);
+            mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())));
+            controller = new CpuMetricsController(mockLogger.Object, mockRepository.Object, mapper);
         }
 
         [Fact]

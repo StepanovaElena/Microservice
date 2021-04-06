@@ -7,14 +7,17 @@ using MetricsAgent.Controllers;
 using Microsoft.Extensions.Logging;
 using Moq;
 using MetricsAgent.DAL;
-using MetricsAgent.Entities;
 using MetricsAgent.Responses;
+using AutoMapper;
+using MetricsAgent;
+using MetricsAgent.Models;
 
 namespace MetricsAgentTest
 {
     public class DotNetMetricsControllerUnitTests
     {
         private Mock<ILogger<DotNetMetricsController>> mockLogger;
+        private Mapper mapper;
         private Mock<IDotNetMetricsRepository> mockRepository;
         private DotNetMetricsController controller;
 
@@ -22,7 +25,8 @@ namespace MetricsAgentTest
         {
             mockRepository = new Mock<IDotNetMetricsRepository>();
             mockLogger = new Mock<ILogger<DotNetMetricsController>>();
-            controller = new DotNetMetricsController(mockLogger.Object, mockRepository.Object);
+            mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())));
+            controller = new DotNetMetricsController(mockLogger.Object, mockRepository.Object, mapper);
         }
 
         [Fact]

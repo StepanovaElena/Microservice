@@ -1,4 +1,5 @@
-﻿using MetricsAgent.DAL;
+﻿using AutoMapper;
+using MetricsAgent.DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,12 +14,14 @@ namespace MetricsAgent.Controllers
     public class RamMetricsController : Controller
     {
         private readonly ILogger<RamMetricsController> _logger;
+        private readonly IMapper _mapper;
         private readonly IRamMetricsRepository _repository;
 
-        public RamMetricsController(ILogger<RamMetricsController> logger, IRamMetricsRepository repository)
+        public RamMetricsController(ILogger<RamMetricsController> logger, IRamMetricsRepository repository, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
             _logger.LogInformation("NLog встроен в RamMetricsController");
         }
 
