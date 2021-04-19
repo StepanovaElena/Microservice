@@ -37,5 +37,25 @@ namespace MetricsAgent.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetrics([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        {
+            _logger.LogDebug($"GetMetrics : fromTime = {fromTime}; toTime = {toTime}");
+
+            var metrics = _repository.GetInTimePeriod(fromTime, toTime);
+
+            var response = new AllDotNetMetricsResponse()
+            {
+                Metrics = new List<DotNetMetricDto>()
+            };
+
+            foreach (var metric in metrics)
+            {
+                response.Metrics.Add(_mapper.Map<DotNetMetricDto>(metric));
+            }
+
+            return Ok(response);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MetricsAgent.DAL;
+using MetricsAgent.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -32,6 +33,26 @@ namespace MetricsAgent.Controllers
             _logger.LogDebug("GetSpaceLeft : без параметров");
 
             return Ok();
+        }
+
+        [HttpGet("from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetrics([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        {
+            _logger.LogDebug($"GetMetrics : fromTime = {fromTime}; toTime = {toTime}");
+
+            var metrics = _repository.GetInTimePeriod(fromTime, toTime);
+
+            var response = new AllHddMetricsResponse()
+            {
+                Metrics = new List<HddMetricDto>()
+            };
+
+            foreach (var metric in metrics)
+            {
+                response.Metrics.Add(_mapper.Map<HddMetricDto>(metric));
+            }
+
+            return Ok(response);
         }
     }
 }

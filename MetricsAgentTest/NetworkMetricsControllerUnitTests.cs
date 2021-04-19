@@ -3,6 +3,7 @@ using MetricsAgent;
 using MetricsAgent.Controllers;
 using MetricsAgent.DAL;
 using MetricsAgent.Models;
+using MetricsAgent.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -48,13 +49,28 @@ namespace MetricsAgentTest
             var toTime = DateTimeOffset.Now;
 
             // Arrange
-            mockRepository.Setup(repository => repository.GetInTimePeriod(fromTime, toTime)).Returns(new List<NetworkMetric>());
+            mockRepository.
+                Setup(repository => repository.GetInTimePeriod(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
+                .Returns(GetTestNetworkMetric());
 
             // Act
             var result = controller.GetMetrics(fromTime, toTime);
 
             // Assert
-            Assert.NotNull(result);
+            var response = ((result as OkObjectResult).Value as AllNetworkMetricsResponse).Metrics;
+            Assert.Equal(GetTestNetworkMetric().Count, response.Count);
+        }
+
+        private List<NetworkMetric> GetTestNetworkMetric()
+        {
+            var networkMetric = new List<NetworkMetric>
+            {
+                new NetworkMetric { Id=1, Value=4, Time=4},
+                new NetworkMetric { Id=2, Value=3, Time=3},
+                new NetworkMetric { Id=3, Value=2, Time=2},
+                new NetworkMetric { Id=4, Value=1, Time=1}
+            };      
+            return networkMetric;
         }
     }
 }

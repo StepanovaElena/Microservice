@@ -12,7 +12,7 @@ namespace MetricsAgent
 	{
 		public MapperProfile()
 		{
-			CreateMap<CpuMetric, CpuMetricDto>();
+			CreateMap<CpuMetric, DotNetMetricDto>();
 			CreateMap<DotNetMetric, DotNetMetricDto>();
 			CreateMap<HddMetric, HddMetricDto>();
 			CreateMap<NetworkMetric, NetworkMetricDto>();

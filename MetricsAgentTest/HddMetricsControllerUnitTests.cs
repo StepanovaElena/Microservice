@@ -2,6 +2,8 @@
 using MetricsAgent;
 using MetricsAgent.Controllers;
 using MetricsAgent.DAL;
+using MetricsAgent.Models;
+using MetricsAgent.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -35,6 +37,37 @@ namespace MetricsAgentTest
 
             // Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);
+        }
+
+        [Fact]
+        public void GetMetrics_ShouldCall_GetInTimePeriod_From_Repository()
+        {
+            var fromTime = DateTimeOffset.MinValue;
+            var toTime = DateTimeOffset.Now;
+
+            // Arrange
+            mockRepository.
+                Setup(repository => repository.GetInTimePeriod(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
+                .Returns(GetTestHddMetric());
+
+            // Act
+            var result = controller.GetMetrics(fromTime, toTime);
+
+            // Assert
+            var response = ((result as OkObjectResult).Value as AllHddMetricsResponse).Metrics;
+            Assert.Equal(GetTestHddMetric().Count, response.Count);
+        }
+
+        private List<HddMetric> GetTestHddMetric()
+        {
+            var hddMetric = new List<HddMetric>
+            {
+                new HddMetric { Id=1, Value=4, Time=4},
+                new HddMetric { Id=2, Value=3, Time=3},
+                new HddMetric { Id=3, Value=2, Time=2},
+                new HddMetric { Id=4, Value=1, Time=1}
+            };
+            return hddMetric;
         }
     }
 }

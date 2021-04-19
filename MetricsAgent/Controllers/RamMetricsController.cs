@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MetricsAgent.DAL;
+using MetricsAgent.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -31,6 +32,26 @@ namespace MetricsAgent.Controllers
             _logger.LogDebug("GetAvailableRam : без параметров");
 
             return Ok();
+        }
+
+        [HttpGet("from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetrics([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
+        {
+            _logger.LogDebug($"GetMetrics : fromTime = {fromTime}; toTime = {toTime}");
+
+            var metrics = _repository.GetInTimePeriod(fromTime, toTime);
+
+            var response = new AllRamMetricsResponse()
+            {
+                Metrics = new List<RamMetricDto>()
+            };
+
+            foreach (var metric in metrics)
+            {
+                response.Metrics.Add(_mapper.Map<RamMetricDto>(metric));
+            }
+
+            return Ok(response);
         }
     }
 }
