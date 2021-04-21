@@ -1,5 +1,4 @@
-﻿using Core.Interfaces;
-using MetricsAgent.Models;
+﻿using MetricsAgent.Models;
 
 namespace MetricsAgent.DAL
 {

@@ -27,23 +27,6 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public void Delete(int id)
-        {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
-                connection.Execute("DELETE FROM dotnetmetrics WHERE id=@id", new { id = id });
-            }
-        }
-
-        public void Update(DotNetMetric item)
-        {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
-                connection.Execute("UPDATE dotnetmetrics SET value = @value, time = @time WHERE id=@id",
-                    new { value = item.Value, time = item.Time, id = item.Id });
-            }
-        }
-
         public IList<DotNetMetric> GetAll()
         {
             using (var connection = new SQLiteConnection(ConnectionString))
@@ -66,6 +49,14 @@ namespace MetricsAgent.DAL
             {
                 return connection.Query<DotNetMetric>("SELECT * FROM dotnetmetrics WHERE time <= @timeEnd AND time >= @timeStart",
                     new { timeStart = timeStart.ToUnixTimeSeconds(), timeEnd = timeEnd.ToUnixTimeSeconds() }).ToList();
+            }
+        }
+
+        public DotNetMetric GetLast()
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.QuerySingle<DotNetMetric>("SELECT * FROM dotnetmetrics WHERE time = (SELECT MAX(time) FROM dotnetmetrics)");
             }
         }
     }

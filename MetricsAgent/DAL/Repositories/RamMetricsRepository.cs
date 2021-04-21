@@ -27,23 +27,6 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public void Delete(int id)
-        {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
-                connection.Execute("DELETE FROM rammetrics WHERE id=@id", new { id = id });
-            }
-        }
-
-        public void Update(RamMetric item)
-        {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
-                connection.Execute("UPDATE rammetrics SET value = @value, time = @time WHERE id=@id",
-                    new { value = item.Value, time = item.Time, id = item.Id });
-            }
-        }
-
         public IList<RamMetric> GetAll()
         {
             using (var connection = new SQLiteConnection(ConnectionString))
@@ -66,6 +49,14 @@ namespace MetricsAgent.DAL
             {
                 return connection.Query<RamMetric>("SELECT * FROM rammetrics WHERE time <= @timeEnd AND time >= @timeStart",
                     new { timeStart = timeStart.ToUnixTimeSeconds(), timeEnd = timeEnd.ToUnixTimeSeconds() }).ToList();
+            }
+        }
+
+        public RamMetric GetLast()
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.QuerySingle<RamMetric>("SELECT * FROM rammetrics WHERE time = (SELECT MAX(time) FROM rammetrics)");
             }
         }
     }

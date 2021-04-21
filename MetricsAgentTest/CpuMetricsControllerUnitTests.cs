@@ -2,7 +2,6 @@ using AutoMapper;
 using MetricsAgent;
 using MetricsAgent.Controllers;
 using MetricsAgent.DAL;
-using MetricsAgent.Entities;
 using MetricsAgent.Models;
 using MetricsAgent.Responses;
 using MetricsManager.Enums;

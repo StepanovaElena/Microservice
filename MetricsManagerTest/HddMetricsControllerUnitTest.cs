@@ -1,24 +1,31 @@
 ﻿using System;
 using Xunit;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using MetricsManager.Controllers;
 using MetricsManager.Enums;
 using Microsoft.Extensions.Logging;
 using Moq;
+using MetricsManager.DAL.Interfaces;
+using AutoMapper;
+using MetricsManager;
 
-namespace MetricsAgentTest
+namespace MetricsManagerTest
 {
     public class HddMetricsControllerUnitTest
     {
-        private HddMetricsController controller;
-        private Mock<ILogger<HddMetricsController>> mockLogger;
+        private readonly HddMetricsController controller;
+        private readonly Mock<ILogger<HddMetricsController>> mockLogger;
+        private readonly Mock<IHddMetricsRepository> mockRepository;
+        private readonly Mock<IAgentsRepository> mockAgentsRepository;
+        private readonly Mapper mapper;
 
         public HddMetricsControllerUnitTest()
         {
             mockLogger = new Mock<ILogger<HddMetricsController>>();
-            controller = new HddMetricsController(mockLogger.Object);
+            mockRepository = new Mock<IHddMetricsRepository>();
+            mockAgentsRepository = new Mock<IAgentsRepository>();
+            mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())));
+            controller = new HddMetricsController(mockLogger.Object, mockRepository.Object, mockAgentsRepository.Object, mapper);
         }
 
         [Fact]

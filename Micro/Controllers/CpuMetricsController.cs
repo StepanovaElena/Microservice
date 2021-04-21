@@ -1,10 +1,10 @@
-﻿using MetricsManager.Enums;
+﻿using AutoMapper;
+using MetricsManager.DAL.Interfaces;
+using MetricsManager.DAL.Responses;
+using MetricsManager.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MetricsManager.Controllers
 {
@@ -13,11 +13,22 @@ namespace MetricsManager.Controllers
     public class CpuMetricsController : ControllerBase
     {
         private readonly ILogger<CpuMetricsController> _logger;
+        private readonly ICpuMetricsRepository _repository;
+        private readonly IAgentsRepository _agentRepository;
+        private readonly IMapper _mapper;
 
-        public CpuMetricsController(ILogger<CpuMetricsController> logger)
+        public CpuMetricsController(
+            ILogger<CpuMetricsController> logger,
+            ICpuMetricsRepository repository,
+            IAgentsRepository agentRepository,
+            IMapper mapper)
         {
             _logger = logger;
-            _logger.LogInformation("NLog встроен в CpuMetricsController");
+            _logger.LogDebug("NLog зарегистрирован в CpuMetricsController");
+
+            _repository = repository;
+            _mapper = mapper;
+            _agentRepository = agentRepository;
         }
 
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
@@ -25,8 +36,16 @@ namespace MetricsManager.Controllers
         {
             _logger.LogDebug($"GetMetricsFromAgent : agentId = {agentId}; fromTime = {fromTime}; toTime = {toTime}");
 
+            var metrics = _repository.GetInTimePeriod(agentId, fromTime, toTime);
 
-            return Ok();
+            var response = new AllCpuMetricsResponse();
+
+            foreach (var metric in metrics)
+            {
+                response.Metrics.Add(_mapper.Map<CpuMetricDto>(metric));
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
@@ -34,7 +53,9 @@ namespace MetricsManager.Controllers
         {
             _logger.LogDebug($"GetMetricsByPercentileFromAgent : agentId = {agentId}; fromTime = {fromTime}; toTime = {toTime}");
 
-            return Ok();
+            var metric = _repository.GetInTimePeriodPercentile(agentId, fromTime, toTime, percentile);
+
+            return Ok(_mapper.Map<CpuMetricDto>(metric));
         }
 
         [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
@@ -42,7 +63,21 @@ namespace MetricsManager.Controllers
         {
             _logger.LogDebug($"GetMetricsFromAllCluster : fromTime = {fromTime}; toTime = {toTime}");
 
-            return Ok();
+            var agents = _agentRepository.GetAllAgentsInfo();
+
+            var response = new AllCpuMetricsResponse();
+
+            foreach (var agent in agents)
+            {
+                var metrics = _repository.GetInTimePeriod(agent.AgentId, fromTime, toTime); ;
+
+                foreach (var metric in metrics)
+                {
+                    response.Metrics.Add(_mapper.Map<CpuMetricDto>(metric));
+                }
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("cluster/from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
@@ -50,7 +85,17 @@ namespace MetricsManager.Controllers
         {
             _logger.LogDebug($"GetMetricsByPercentileFromAllCluster : fromTime = {fromTime}; toTime = {toTime}; percentile = {percentile}");
 
-            return Ok();
+            var agents = _agentRepository.GetAllAgentsInfo();
+
+            var response = new AllCpuMetricsResponse();
+
+            foreach (var agent in agents)
+            {
+                var metric = _repository.GetInTimePeriodPercentile(agent.AgentId, fromTime, toTime, percentile);
+                response.Metrics.Add(_mapper.Map<CpuMetricDto>(metric));
+            }
+
+            return Ok(response);
         }
     }
 }

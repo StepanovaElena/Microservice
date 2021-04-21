@@ -1,24 +1,31 @@
 ﻿using System;
 using Xunit;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using MetricsManager.Controllers;
 using MetricsManager.Enums;
 using Microsoft.Extensions.Logging;
 using Moq;
+using MetricsManager.DAL.Interfaces;
+using AutoMapper;
+using MetricsManager;
 
-namespace MetricsAgentTest
+namespace MetricsManagerTest
 {
     public class RamMetricsControllerUnitTest
     {
-        private RamMetricsController controller;
-        private Mock<ILogger<RamMetricsController>> mockLogger;
+        private readonly RamMetricsController controller;
+        private readonly Mock<ILogger<RamMetricsController>> mockLogger;
+        private readonly Mock<IRamMetricsRepository> mockRepository;
+        private readonly Mock<IAgentsRepository> mockAgentsRepository;
+        private readonly Mapper mapper;
 
         public RamMetricsControllerUnitTest()
         {
             mockLogger = new Mock<ILogger<RamMetricsController>>();
-            controller = new RamMetricsController(mockLogger.Object);
+            mockRepository = new Mock<IRamMetricsRepository>();
+            mockAgentsRepository = new Mock<IAgentsRepository>();
+            mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())));
+            controller = new RamMetricsController(mockLogger.Object, mockRepository.Object, mockAgentsRepository.Object, mapper);
         }
 
         [Fact]

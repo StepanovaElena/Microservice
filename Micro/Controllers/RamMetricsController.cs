@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MetricsManager.Enums;
 using Microsoft.Extensions.Logging;
+using MetricsManager.DAL.Interfaces;
+using AutoMapper;
+using MetricsManager.DAL.Responses;
 
 namespace MetricsManager.Controllers
 {
@@ -14,11 +14,22 @@ namespace MetricsManager.Controllers
     public class RamMetricsController : Controller
     {
         private readonly ILogger<RamMetricsController> _logger;
+        private readonly IRamMetricsRepository _repository;
+        private readonly IAgentsRepository _agentRepository;
+        private readonly IMapper _mapper;
 
-        public RamMetricsController(ILogger<RamMetricsController> logger)
+        public RamMetricsController(
+            ILogger<RamMetricsController> logger,
+            IRamMetricsRepository repository,
+            IAgentsRepository agentRepository,
+            IMapper mapper)
         {
             _logger = logger;
-            _logger.LogInformation("NLog встроен в RamMetricsController");
+            _logger.LogDebug("NLog зарегистрирован в RamMetricsController");
+
+            _repository = repository;
+            _mapper = mapper;
+            _agentRepository = agentRepository;
         }
 
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
@@ -26,8 +37,16 @@ namespace MetricsManager.Controllers
         {
             _logger.LogDebug($"GetMetricsFromAgent : agentId = {agentId}; fromTime = {fromTime}; toTime = {toTime}");
 
+            var metrics = _repository.GetInTimePeriod(agentId, fromTime, toTime);
 
-            return Ok();
+            var response = new AllRamMetricsResponse();
+
+            foreach (var metric in metrics)
+            {
+                response.Metrics.Add(_mapper.Map<RamMetricDto>(metric));
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
@@ -35,7 +54,9 @@ namespace MetricsManager.Controllers
         {
             _logger.LogDebug($"GetMetricsByPercentileFromAgent : agentId = {agentId}; fromTime = {fromTime}; toTime = {toTime}");
 
-            return Ok();
+            var metric = _repository.GetInTimePeriodPercentile(agentId, fromTime, toTime, percentile);
+
+            return Ok(_mapper.Map<HddMetricDto>(metric));
         }
 
         [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
@@ -43,7 +64,21 @@ namespace MetricsManager.Controllers
         {
             _logger.LogDebug($"GetMetricsFromAllCluster : fromTime = {fromTime}; toTime = {toTime}");
 
-            return Ok();
+            var agents = _agentRepository.GetAllAgentsInfo();
+
+            var response = new AllRamMetricsResponse();
+
+            foreach (var agent in agents)
+            {
+                var metrics = _repository.GetInTimePeriod(agent.AgentId, fromTime, toTime); ;
+
+                foreach (var metric in metrics)
+                {
+                    response.Metrics.Add(_mapper.Map<RamMetricDto>(metric));
+                }
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("cluster/from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
@@ -51,7 +86,17 @@ namespace MetricsManager.Controllers
         {
             _logger.LogDebug($"GetMetricsByPercentileFromAllCluster : fromTime = {fromTime}; toTime = {toTime}; percentile = {percentile}");
 
-            return Ok();
+            var agents = _agentRepository.GetAllAgentsInfo();
+
+            var response = new AllRamMetricsResponse();
+
+            foreach (var agent in agents)
+            {
+                var metric = _repository.GetInTimePeriodPercentile(agent.AgentId, fromTime, toTime, percentile);
+                response.Metrics.Add(_mapper.Map<RamMetricDto>(metric));
+            }
+
+            return Ok(response);
         }
     }
 }

@@ -7,18 +7,27 @@ using MetricsManager.Enums;
 using MetricsManager.Controllers;
 using Moq;
 using Microsoft.Extensions.Logging;
+using MetricsManager.DAL.Interfaces;
+using AutoMapper;
+using MetricsManager;
 
-namespace MetricsAgentTest
+namespace MetricsManagerTest
 {
     public class DotNetMetricsControllerUnitTest
     {
-        private DotNetMetricsController controller;
-        private Mock<ILogger<DotNetMetricsController>> mockLogger;
+        private readonly DotNetMetricsController controller;
+        private readonly Mock<ILogger<DotNetMetricsController>> mockLogger;
+        private readonly Mock<IDotNetMetricsRepository> mockRepository;
+        private readonly Mock<IAgentsRepository> mockAgentsRepository;
+        private readonly Mapper mapper;
 
         public DotNetMetricsControllerUnitTest()
         {
             mockLogger = new Mock<ILogger<DotNetMetricsController>>();
-            controller = new DotNetMetricsController(mockLogger.Object);
+            mockRepository = new Mock<IDotNetMetricsRepository>();
+            mockAgentsRepository = new Mock<IAgentsRepository>();
+            mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())));
+            controller = new DotNetMetricsController(mockLogger.Object, mockRepository.Object, mockAgentsRepository.Object, mapper);
         }
 
         [Fact]

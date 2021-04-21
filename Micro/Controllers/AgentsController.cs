@@ -1,10 +1,9 @@
-﻿using MetricsManager.Dto;
+﻿using AutoMapper;
+using MetricsManager.DAL.Interfaces;
+using MetricsManager.DAL.Models;
+using MetricsManager.DAL.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MetricsManager.Controllers
 {
@@ -13,25 +12,41 @@ namespace MetricsManager.Controllers
     public class AgentsController : ControllerBase
     {
         private readonly ILogger<AgentsController> _logger;
+        private readonly IAgentsRepository _repository;
+        private readonly IMapper _mapper;
 
-        public AgentsController(ILogger<AgentsController> logger)
+        public AgentsController(ILogger<AgentsController> logger, IAgentsRepository repository, IMapper mapper)
         {
+            _repository = repository;
             _logger = logger;
+            _mapper = mapper;
             _logger.LogInformation("NLog зарегистрирован в AgentsController");
         }
-
 
         [HttpGet("read")]
         public IActionResult ReadRegisteredAgents()
         {
             _logger.LogInformation("NLog вызван в ReadRegisteredAgents");
-            return Ok();
+
+            var allAgentsInfo = _repository.GetAllAgentsInfo();
+
+            var response = new AllAgentsInfoResponse();
+
+            foreach (var agentInfo in allAgentsInfo)
+            {
+                response.Agents.Add(_mapper.Map<AgentInfoDto>(agentInfo));
+            }
+
+            return Ok(response);
         }
 
         [HttpPost("register")]
         public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
         {
             _logger.LogInformation("NLog вызван в RegisterAgent");
+
+            _repository.RegisterAgent(agentInfo);
+
             return Ok();
         }
 

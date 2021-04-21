@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Core.Interfaces
+namespace MetricsAgent.DAL
 {
     public interface IRepository<T> where T : class
     {
@@ -13,10 +11,8 @@ namespace Core.Interfaces
 
         T GetById(int id);
 
+        T GetLast();
+
         void Create(T item);
-
-        void Update(T item);
-
-        void Delete(int id);
     }
 }

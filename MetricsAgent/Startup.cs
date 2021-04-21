@@ -93,14 +93,13 @@ namespace MetricsAgent
 
             app.UseAuthorization();
 
+            // запускаем миграции
+            migrationRunner.MigrateUp();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-
-            // запускаем миграции
-            migrationRunner.MigrateUp();
-
         }
     }
 }
