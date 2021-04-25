@@ -35,14 +35,6 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public HddMetric GetById(int id)
-        {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
-                return connection.QuerySingle<HddMetric>("SELECT Id, Time, Value FROM hddmetrics WHERE id=@id", new { id = id });
-            }
-        }
-
         public IList<HddMetric> GetInTimePeriod(DateTimeOffset timeStart, DateTimeOffset timeEnd)
         {            
             using (var connection = new SQLiteConnection(ConnectionString))

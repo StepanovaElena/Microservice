@@ -6,7 +6,7 @@ namespace MetricsManager.DAL.Models
     public class AgentInfo
     {
         [Key]
-        public int? Id { get; set; }
+        public int Id { get; set; }
 
         public int AgentId { get; set; }
 

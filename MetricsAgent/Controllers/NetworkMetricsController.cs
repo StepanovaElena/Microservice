@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MetricsAgent.Controllers
 {
@@ -27,6 +25,12 @@ namespace MetricsAgent.Controllers
             _logger.LogInformation("NLog встроен в NetworkMetricsController");
         }
 
+        /// <summary>
+        /// Получение Network метрик в заданный промежуток времени.
+        /// </summary>
+        /// <param name="fromTime">Временная метка начала выборки.</param>
+        /// <param name="toTime">Временная метка окончания выборки.</param>
+        /// <returns>Список метрик в заданный интервал времени.</returns>
         [HttpGet("from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetrics([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {

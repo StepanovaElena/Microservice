@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using MetricsManager.DAL.Interfaces;
 using MetricsManager.DAL.Models;
-using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
@@ -16,12 +15,12 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QuerySingle<AgentInfo>("SELECT * FROM agents WHERE agentId == @agentId",
+                return connection.QuerySingle<AgentInfo>("SELECT * FROM agents WHERE agentId = @agentId",
                 new { agentId });
             }
         }
 
-        public IList<AgentInfo> GetAllAgentsInfo()
+        public List<AgentInfo> GetAllAgentsInfo()
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {

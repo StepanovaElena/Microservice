@@ -39,9 +39,15 @@ namespace MetricsManagerTest
             var fromTime = DateTimeOffset.MinValue;
             var toTime = DateTimeOffset.Now;
 
+            mockAgentsRepository
+                .Setup(repository => repository.GetAllAgentsInfo())
+                .Returns(GetTestAgentsInfo());
+
             mockRepository
-                .Setup(repository => repository
-                .GetInTimePeriod(It.IsAny<int>(), It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
+                .Setup(repository => repository.GetInTimePeriod(
+                    It.IsAny<int>(), 
+                    It.IsAny<DateTimeOffset>(), 
+                    It.IsAny<DateTimeOffset>()))
                 .Returns(GetTestCpuMetricFromAgent());
 
             //Act
@@ -49,7 +55,6 @@ namespace MetricsManagerTest
 
             // Assert
             var response = ((result as OkObjectResult).Value as AllCpuMetricsResponse).Metrics;
-
             Assert.Equal(GetTestCpuMetricFromAgent().Count, response.Count);
         }
 
@@ -87,49 +92,49 @@ namespace MetricsManagerTest
             
             mockAgentsRepository
                 .Setup(repository => repository.GetAllAgentsInfo())
-                .Returns(GetTestAgentsInfo());
-
-            var firstAgentMetrics = GetTestCpuMetric().FindAll(m => m.AgentId == 1);
-            var secondAgentMetrics = GetTestCpuMetric().FindAll(m => m.AgentId == 2);
+                .Returns(GetTestAgentsInfo().FindAll(m => (m.AgentId <= 2)));
             
-            mockRepository.
-                Setup(repository => repository.GetInTimePeriod(
-                    It.Is<int>(agentId => agentId == 1),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>())).
-                Returns(firstAgentMetrics);
-
             mockRepository.
                 Setup(repository => repository.GetInTimePeriod(
                     It.Is<int>(agentId => agentId == 2),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>())).
-                Returns(secondAgentMetrics);
+                Returns(GetTestCpuMetric().FindAll(m => m.AgentId == 2));
+
+            mockRepository.
+                Setup(repository => repository.GetInTimePeriod(
+                    It.Is<int>(agentId => agentId == 1),
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<DateTimeOffset>())).
+                Returns(GetTestCpuMetric().FindAll(m => m.AgentId == 1));
 
             //Act
             var result = controller.GetMetricsFromAllCluster(fromTime, toTime);
-
+            var expectedResult = GetTestCpuMetric().FindAll(m => (m.AgentId <= 2));
             // Assert
             var response = ((result as OkObjectResult).Value as AllCpuMetricsResponse).Metrics;
-            Assert.Equal(
-                GetTestCpuMetric().FindAll(m => m.AgentId == 1 && m.AgentId == 2).Count, 
-                response.Count);
+            Assert.Equal(expectedResult.Count, response.Count);
         }
 
         [Fact]
-        public void GetMetricsByPercentileFromAllCluster_ShouldCall_From_Repository()
+        public void GetMetricsByPercentileFromClusters__ShouldCall_From_Repository()
         {
             //Arrange
             var fromTime = DateTimeOffset.MinValue;
             var toTime = DateTimeOffset.Now;
-            var percentile = Percentile.P95;
+            var percentile = Percentile.P90;
 
             mockAgentsRepository
                 .Setup(repository => repository.GetAllAgentsInfo())
-                .Returns(GetTestAgentsInfo());
+                .Returns(GetTestAgentsInfo().FindAll(m => (m.AgentId <= 2)));
 
-            var firstAgentMetrics = GetTestCpuMetric().FindAll(m => m.AgentId == 1)[0];
-            var thirdAgentMetrics = GetTestCpuMetric().FindAll(m => m.AgentId == 3)[0];
+            mockRepository.
+                Setup(repository => repository.GetInTimePeriodPercentile(
+                    It.Is<int>(agentId => agentId == 2),
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<Percentile>())).
+                Returns(GetTestCpuMetric().FindAll(m => m.AgentId == 2)[1]);
 
             mockRepository.
                 Setup(repository => repository.GetInTimePeriodPercentile(
@@ -137,43 +142,28 @@ namespace MetricsManagerTest
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<Percentile>())).
-                Returns(firstAgentMetrics);
-
-            mockRepository.
-                Setup(repository => repository.GetInTimePeriodPercentile(
-                    It.Is<int>(agentId => agentId == 3),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<Percentile>())).
-                Returns(thirdAgentMetrics);
+                Returns(GetTestCpuMetric().FindAll(m => m.AgentId == 1)[0]);
 
             //Act
             var result = controller.GetMetricsByPercentileFromAllCluster(fromTime, toTime, percentile);
 
             // Assert
-            var response = ((result as OkObjectResult).Value as AllCpuMetricsResponse).Metrics;
-            var expectedList = new List<CpuMetricDto>
+            var expected = mapper.Map<CpuMetricDto>(GetTestCpuMetric()[1]);
+            var response = ((result as OkObjectResult).Value as AllCpuMetricsResponse);
+            var checkResult = false;
+
+            for (int i = 0; i < response.Metrics.Count; i++)
             {
-                mapper.Map<CpuMetricDto>(firstAgentMetrics),
-                mapper.Map<CpuMetricDto>(thirdAgentMetrics)
-            };
+                if ((response.Metrics[i].Value != expected.Value) ||
+                    (response.Metrics[i].Time != expected.Time) ||
+                    (response.Metrics[i].AgentId != expected.AgentId))
+                {
+                    checkResult = true;
+                    break;
+                }
+            }
 
-            Assert.Equal(expectedList.ToArray(), response.ToArray());
-        }
-
-        [Fact]
-        public void GetMetricsFromAgent_ReturnsOk()
-        {
-            //Arrange
-            var agentId = 1;
-            var fromTime = DateTimeOffset.MinValue;
-            var toTime = DateTimeOffset.Now;
-
-            //Act
-            var result = controller.GetMetricsFromAgent(agentId, fromTime, toTime);
-
-            // Assert
-            _ = Assert.IsAssignableFrom<IActionResult>(result);
+            Assert.True(checkResult);
         }
 
         [Fact]
@@ -205,6 +195,7 @@ namespace MetricsManagerTest
                 new CpuMetric { Id=7, Value=20, Time=129030884876, AgentId=4},
                 new CpuMetric { Id=8, Value=10, Time=129030884876, AgentId=4}
             };
+
             return cpuMetric;
         }
 
@@ -212,9 +203,10 @@ namespace MetricsManagerTest
         {
             var cpuMetric = new List<CpuMetric>
             {
-                new CpuMetric { Id=1, Value=40, Time=129030884876, AgentId=2},
-                new CpuMetric { Id=2, Value=300, Time=129030884876, AgentId=2}
+                new CpuMetric { Id=1, Value=30, Time=1, AgentId=2},
+                new CpuMetric { Id=2, Value=40, Time=2, AgentId=2}
             };
+
             return cpuMetric;
         }
 
@@ -222,11 +214,10 @@ namespace MetricsManagerTest
         {
             var agentMetric = new List<AgentInfo>
             {
-                new AgentInfo { Id=1, AgentId=3, AgentUrl="http://www.example.com"},
-                new AgentInfo { Id=2, AgentId=5, AgentUrl="http://www.example.com"},
-                new AgentInfo { Id=3, AgentId=4, AgentUrl="http://www.example.com"},
+                new AgentInfo { Id=1, AgentId=1, AgentUrl="http://www.example.com"},
                 new AgentInfo { Id=4, AgentId=2, AgentUrl="http://www.example.com"}
             };
+
             return agentMetric;
         }
 

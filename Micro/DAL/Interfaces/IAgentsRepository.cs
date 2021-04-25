@@ -5,7 +5,7 @@ namespace MetricsManager.DAL.Interfaces
 {
 	public interface IAgentsRepository
 	{
-		IList<AgentInfo> GetAllAgentsInfo();
+		List<AgentInfo> GetAllAgentsInfo();
 		
 		AgentInfo GetAgentInfoById(int agentId);
 		

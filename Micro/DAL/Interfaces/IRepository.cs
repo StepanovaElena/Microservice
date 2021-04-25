@@ -12,7 +12,7 @@ namespace MetricsManager.DAL.Interfaces
 
         T GetById(int id);
 
-        IList<T> GetInTimePeriod(int agentId, DateTimeOffset timeFrom, DateTimeOffset timeTo);
+        IList<T> GetInTimePeriod(int agentId, DateTimeOffset fromTime, DateTimeOffset toTime);
 
         T GetInTimePeriodPercentile(int agentId, DateTimeOffset fromTime, DateTimeOffset toTime, Percentile percentile);
 

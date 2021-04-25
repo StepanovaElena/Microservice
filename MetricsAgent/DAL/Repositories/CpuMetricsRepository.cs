@@ -22,7 +22,7 @@ namespace MetricsAgent.DAL
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                connection.Execute("INSERT INTO cpumetrics(value, time) VALUES(@value, @time)",
+                connection.Execute("INSERT INTO cpumetrics(Value, Time) VALUES(@value, @time)",
                   new { value = item.Value, time = item.Time });
             }
         }
@@ -35,19 +35,11 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public CpuMetric GetById(int id)
-        {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
-                return connection.QuerySingle<CpuMetric>("SELECT Id, Time, Value FROM cpumetrics WHERE id=@id", new { id = id });
-            }
-        }
-
         public IList<CpuMetric> GetInTimePeriod(DateTimeOffset timeStart, DateTimeOffset timeEnd)
         {            
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.Query<CpuMetric>("SELECT * FROM cpumetrics WHERE time <= @timeEnd AND time >= @timeStart",
+                return connection.Query<CpuMetric>("SELECT * FROM cpumetrics WHERE Time <= @timeEnd AND Time >= @timeStart",
                     new { timeStart = timeStart.ToUnixTimeSeconds(), timeEnd = timeEnd.ToUnixTimeSeconds() }).ToList();
             }
         }
@@ -56,7 +48,7 @@ namespace MetricsAgent.DAL
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QuerySingle<CpuMetric>("SELECT * FROM cpumetrics WHERE time = (SELECT MAX(time) FROM cpumetrics)");
+                return connection.QuerySingle<CpuMetric>("SELECT * FROM cpumetrics WHERE Time = (SELECT MAX(time) FROM cpumetrics)");
             }
         }
     }

@@ -23,7 +23,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                connection.Execute("INSERT INTO cpumetrics(value, time, agentId) VALUES(@value, @time, @agentId)",
+                connection.Execute("INSERT INTO rammetrics(value, time, agentId) VALUES(@value, @time, @agentId)",
                   new { value = item.Value, time = item.Time, agentId = item.AgentId, });
             }
         }
@@ -32,7 +32,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.Query<RamMetric>("SELECT Id, Time, Value FROM cpumetrics").ToList();
+                return connection.Query<RamMetric>("SELECT Id, Time, Value FROM rammetrics").ToList();
             }
         }
 
@@ -40,7 +40,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QuerySingle<RamMetric>("SELECT Id, Time, Value FROM cpumetrics WHERE id=@id", new { id });
+                return connection.QuerySingle<RamMetric>("SELECT Id, Time, Value FROM rammetrics WHERE id=@id", new { id });
             }
         }
 
@@ -48,7 +48,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.Query<RamMetric>("SELECT * FROM cpumetrics WHERE agentId == @agentId AND time <= @timeEnd AND time >= @timeStart",
+                return connection.Query<RamMetric>("SELECT * FROM rammetrics WHERE agentId = @agentId AND time <= @timeEnd AND time >= @timeStart",
                     new
                     {
                         timeStart = timeStart.ToUnixTimeSeconds(),
@@ -62,7 +62,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM cpumetrics WHERE agentId == @agentId",
+                return connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM rammetrics WHERE agentId = @agentId",
                     new { agentId });
             }
         }

@@ -9,8 +9,6 @@ namespace MetricsAgent.DAL
 
         IList<T> GetInTimePeriod(DateTimeOffset timeFrom, DateTimeOffset timeTo);
 
-        T GetById(int id);
-
         T GetLast();
 
         void Create(T item);

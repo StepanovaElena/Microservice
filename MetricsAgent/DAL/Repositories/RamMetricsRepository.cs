@@ -35,14 +35,6 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public RamMetric GetById(int id)
-        {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
-                return connection.QuerySingle<RamMetric>("SELECT Id, Time, Value FROM rammetrics WHERE id=@id", new { id = id });
-            }
-        }
-
         public IList<RamMetric> GetInTimePeriod(DateTimeOffset timeStart, DateTimeOffset timeEnd)
         {
             using (var connection = new SQLiteConnection(ConnectionString))

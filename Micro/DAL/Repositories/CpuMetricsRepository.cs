@@ -48,7 +48,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.Query<CpuMetric>("SELECT * FROM cpumetrics WHERE agentId == @agentId AND time <= @timeEnd AND time >= @timeStart",
+                return connection.Query<CpuMetric>("SELECT * FROM cpumetrics WHERE agentId = @agentId AND time <= @timeEnd AND time >= @timeStart",
                     new
                     {
                         timeStart = timeStart.ToUnixTimeSeconds(),
@@ -62,7 +62,7 @@ namespace MetricsManager.DAL.Repositories
         {            
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM cpumetrics WHERE agentId == @agentId",
+                return connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM cpumetrics WHERE agentId = @agentId",
                     new { agentId });
             }
         }

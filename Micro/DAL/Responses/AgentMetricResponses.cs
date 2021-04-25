@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MetricsManager.DAL.Responses
 {
@@ -8,8 +9,11 @@ namespace MetricsManager.DAL.Responses
 	}
 	
 	public class AgentInfoDto
-	{
+	{		
+		public int Id { get; set; }
+
 		public int AgentId { get; set; }
+
 		public string AgentUrl { get; set; }
 	}
 }

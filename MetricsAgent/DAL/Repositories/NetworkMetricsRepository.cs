@@ -35,14 +35,6 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public NetworkMetric GetById(int id)
-        {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
-                return connection.QuerySingle<NetworkMetric>("SELECT Id, Time, Value FROM networkmetrics WHERE id=@id", new { id = id });
-            }
-        }
-
         public IList<NetworkMetric> GetInTimePeriod(DateTimeOffset timeStart, DateTimeOffset timeEnd)
         {
             using (var connection = new SQLiteConnection(ConnectionString))

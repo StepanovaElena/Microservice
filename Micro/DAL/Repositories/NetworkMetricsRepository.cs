@@ -32,14 +32,14 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.Query<NetworkMetric>("SELECT Id, Time, Value FROM cpumetrics").ToList();
+                return connection.Query<NetworkMetric>("SELECT Id, Time, Value FROM networkmetrics").ToList();
             }
         }
         public NetworkMetric GetById(int id)
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QuerySingle<NetworkMetric>("SELECT Id, Time, Value FROM cpumetrics WHERE id=@id", new { id });
+                return connection.QuerySingle<NetworkMetric>("SELECT Id, Time, Value FROM networkmetrics WHERE id=@id", new { id });
             }
         }
 
@@ -47,7 +47,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.Query<NetworkMetric>("SELECT * FROM cpumetrics WHERE agentId == @agentId AND time <= @timeEnd AND time >= @timeStart",
+                return connection.Query<NetworkMetric>("SELECT * FROM networkmetrics WHERE agentId = @agentId AND time <= @timeEnd AND time >= @timeStart",
                     new
                     {
                         timeStart = timeStart.ToUnixTimeSeconds(),
@@ -61,7 +61,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM cpumetrics WHERE agentId == @agentId",
+                return connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM networkmetrics WHERE agentId = @agentId",
                     new { agentId });
             }
         }

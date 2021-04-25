@@ -26,21 +26,7 @@ namespace MetricsAgentTest
             mockLogger = new Mock<ILogger<NetworkMetricsController>>();
             mapper = new Mapper(new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())));
             controller = new NetworkMetricsController(mockLogger.Object, mockRepository.Object, mapper);
-        }
-
-        [Fact]
-        public void GetMetrics_ReturnsOk()
-        {
-            //Arrange
-            var fromTime = DateTimeOffset.MinValue;
-            var toTime = DateTimeOffset.Now;
-
-            //Act
-            var result = controller.GetMetrics(fromTime, toTime);
-
-            // Assert
-            _ = Assert.IsAssignableFrom<IActionResult>(result);
-        }
+        }        
 
         [Fact]
         public void GetMetrics_ShouldCall_GetInTimePeriod_From_Repository()

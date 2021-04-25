@@ -35,19 +35,11 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public DotNetMetric GetById(int id)
-        {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
-                return connection.QuerySingle<DotNetMetric>("SELECT Id, Time, Value FROM dotnetmetrics WHERE id=@id", new { id = id });
-            }
-        }
-
         public IList<DotNetMetric> GetInTimePeriod(DateTimeOffset timeStart, DateTimeOffset timeEnd)
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.Query<DotNetMetric>("SELECT * FROM dotnetmetrics WHERE time <= @timeEnd AND time >= @timeStart",
+                return connection.Query<DotNetMetric>("SELECT * FROM dotnetmetrics WHERE Time <= @timeEnd AND Time >= @timeStart",
                     new { timeStart = timeStart.ToUnixTimeSeconds(), timeEnd = timeEnd.ToUnixTimeSeconds() }).ToList();
             }
         }
@@ -56,7 +48,7 @@ namespace MetricsAgent.DAL
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QuerySingle<DotNetMetric>("SELECT * FROM dotnetmetrics WHERE time = (SELECT MAX(time) FROM dotnetmetrics)");
+                return connection.QuerySingle<DotNetMetric>("SELECT * FROM dotnetmetrics WHERE Time = (SELECT MAX(time) FROM dotnetmetrics)");
             }
         }
     }

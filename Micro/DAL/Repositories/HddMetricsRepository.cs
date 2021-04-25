@@ -23,7 +23,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                connection.Execute("INSERT INTO cpumetrics(value, time, agentId) VALUES(@value, @time, @agentId)",
+                connection.Execute("INSERT INTO hddmetrics(value, time, agentId) VALUES(@value, @time, @agentId)",
                   new { value = item.Value, time = item.Time, agentId = item.AgentId, });
             }
         }
@@ -32,14 +32,14 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.Query<HddMetric>("SELECT Id, Time, Value FROM cpumetrics").ToList();
+                return connection.Query<HddMetric>("SELECT Id, Time, Value FROM hddmetrics").ToList();
             }
         }
         public HddMetric GetById(int id)
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QuerySingle<HddMetric>("SELECT Id, Time, Value FROM cpumetrics WHERE id=@id", new { id });
+                return connection.QuerySingle<HddMetric>("SELECT Id, Time, Value FROM hddmetrics WHERE id=@id", new { id });
             }
         }
 
@@ -47,7 +47,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.Query<HddMetric>("SELECT * FROM cpumetrics WHERE agentId == @agentId AND time <= @timeEnd AND time >= @timeStart",
+                return connection.Query<HddMetric>("SELECT * FROM hddmetrics WHERE agentId = @agentId AND time <= @timeEnd AND time >= @timeStart",
                     new
                     {
                         timeStart = timeStart.ToUnixTimeSeconds(),
@@ -61,7 +61,7 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                return connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM cpumetrics WHERE agentId == @agentId",
+                return connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM hddmetrics WHERE agentId = @agentId",
                     new { agentId });
             }
         }

@@ -16,10 +16,10 @@ namespace MetricsAgentTest
 {
     public class HddMetricsControllerUnitTests
     {
-        private Mock<ILogger<HddMetricsController>> mockLogger;
-        private Mapper mapper;
-        private Mock<IHddMetricsRepository> mockRepository;
-        private HddMetricsController controller;
+        private readonly Mock<ILogger<HddMetricsController>> mockLogger;
+        private readonly Mapper mapper;
+        private readonly Mock<IHddMetricsRepository> mockRepository;
+        private readonly HddMetricsController controller;
 
         public HddMetricsControllerUnitTests()
         {

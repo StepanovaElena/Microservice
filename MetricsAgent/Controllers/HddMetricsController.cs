@@ -26,7 +26,10 @@ namespace MetricsAgent.Controllers
             _logger.LogInformation("NLog встроен в HddMetricsController");
         }
 
-
+        /// <summary>
+        /// Получение информации о свободном дисковом пространстве.
+        /// </summary>
+        /// <returns>Информации о свободном дисковом пространстве.</returns>
         [HttpGet("left")]
         public IActionResult GetSpaceLeft()
         {
@@ -35,6 +38,12 @@ namespace MetricsAgent.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Получение Hdd метрик в заданный промежуток времени.
+        /// </summary>
+        /// <param name="fromTime">Временная метка начала выборки.</param>
+        /// <param name="toTime">Временная метка окончания выборки.</param>
+        /// <returns>Список метрик в заданный интервал времени.</returns>
         [HttpGet("from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetrics([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {

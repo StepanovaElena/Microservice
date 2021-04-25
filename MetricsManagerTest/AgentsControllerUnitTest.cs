@@ -31,7 +31,7 @@ namespace MetricsManagerTest
         [Fact]
         public void ReadRegisteredAgents_ShouldCall_From_Repository()
         {
-            // Arrange
+            // Arrange            
             mockRepository.Setup(repository => repository.GetAllAgentsInfo()).Returns(GetTestAgentsInfo());
 
             //Act
@@ -89,11 +89,12 @@ namespace MetricsManagerTest
         {
             var agentMetric = new List<AgentInfo>
             {
-                new AgentInfo { Id=1, AgentId=3, AgentUrl="http://www.example.com"},
+                new AgentInfo { Id=1, AgentId=1, AgentUrl="http://www.example.com"},
                 new AgentInfo { Id=2, AgentId=5, AgentUrl="http://www.example.com"},
                 new AgentInfo { Id=3, AgentId=4, AgentUrl="http://www.example.com"},
                 new AgentInfo { Id=4, AgentId=2, AgentUrl="http://www.example.com"}
             };
+
             return agentMetric;
         }
     }

@@ -34,6 +34,13 @@ namespace MetricsManager.Controllers
             _agentRepository = agentRepository;
         }
 
+        /// <summary>
+        /// Получение NetWork метрик в заданный промежуток времени от конкретного агента.
+        /// </summary>
+        /// <param name="fromTime">Временная метка начала выборки.</param>
+        /// <param name="toTime">Временная метка окончания выборки.</param>
+        /// <param name="agentId">Идентификатор агента.</param>
+        /// <returns>Список метрик в заданный интервал времени.</returns>
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
@@ -41,7 +48,10 @@ namespace MetricsManager.Controllers
 
             var metrics = _repository.GetInTimePeriod(agentId, fromTime, toTime);
 
-            var response = new AllNetworkMetricsResponse();
+            var response = new AllNetworkMetricsResponse()
+            {
+                Metrics = new List<NetworkMetricDto>()
+            };
 
             foreach (var metric in metrics)
             {
@@ -51,6 +61,14 @@ namespace MetricsManager.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Получение NetWork метрик в заданный промежуток времени от конкретного агента c учетом значения процентиля.
+        /// </summary>
+        /// <param name="fromTime">Временная метка начала выборки.</param>
+        /// <param name="toTime">Временная метка окончания выборки.</param>
+        /// <param name="agentId">Идентификатор агента.</param>
+        /// <param name="percentile">Значение процентиля.</param>
+        /// <returns>Список метрик в заданный интервал времени.</returns>
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
         public IActionResult GetMetricsByPercentileFromAgent([FromRoute] int agentId, [FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime, [FromRoute] Percentile percentile)
         {
@@ -58,9 +76,15 @@ namespace MetricsManager.Controllers
 
             var metric = _repository.GetInTimePeriodPercentile(agentId, fromTime, toTime, percentile);
 
-            return Ok(_mapper.Map<HddMetricDto>(metric));
+            return Ok(_mapper.Map<NetworkMetricDto>(metric));
         }
 
+        /// <summary>
+        /// Получение NetWork метрик в заданный промежуток времени от всех агентов.
+        /// </summary>
+        /// <param name="fromTime">Временная метка начала выборки.</param>
+        /// <param name="toTime">Временная метка окончания выборки.</param>
+        /// <returns>Список метрик в заданный интервал времени.</returns>
         [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetricsFromAllCluster([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
@@ -68,7 +92,10 @@ namespace MetricsManager.Controllers
 
             var agents = _agentRepository.GetAllAgentsInfo();
 
-            var response = new AllNetworkMetricsResponse();
+            var response = new AllNetworkMetricsResponse()
+            {
+                Metrics = new List<NetworkMetricDto>()
+            };
 
             foreach (var agent in agents)
             {
@@ -83,6 +110,14 @@ namespace MetricsManager.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Получение NetWork метрик в заданный промежуток времени от всех агентов c учетом значения процентиля.
+        /// </summary>
+        /// <param name="fromTime">Временная метка начала выборки.</param>
+        /// <param name="toTime">Временная метка окончания выборки.</param>
+        /// <param name="agentId">Идентификатор агента.</param>
+        /// <param name="percentile">Значение процентиля.</param>
+        /// <returns>Список метрик в заданный интервал времени.</returns>
         [HttpGet("cluster/from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
         public IActionResult GetMetricsByPercentileFromAllCluster([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime, [FromRoute] Percentile percentile)
         {
@@ -90,7 +125,10 @@ namespace MetricsManager.Controllers
 
             var agents = _agentRepository.GetAllAgentsInfo();
 
-            var response = new AllNetworkMetricsResponse();
+            var response = new AllNetworkMetricsResponse()
+            {
+                Metrics = new List<NetworkMetricDto>()
+            };
 
             foreach (var agent in agents)
             {

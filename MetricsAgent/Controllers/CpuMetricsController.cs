@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using MetricsAgent.DAL;
-using MetricsAgent.Models;
-using MetricsAgent.Requests;
 using MetricsAgent.Responses;
-using MetricsManager.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -26,47 +23,15 @@ namespace MetricsAgent.Controllers
             _logger = logger;
             _mapper = mapper;
 
-            _logger.LogInformation("CpuMetricsController ");
+            _logger.LogInformation("NLog зарегистрирован в CpuMetricsController");
         }
 
-        [HttpPost("create")]
-        public IActionResult Create([FromBody] CpuMetricCreateRequest request)
-        {
-            _logger.LogDebug($"Create : request = {request}");
-
-            _repository.Create(new CpuMetric
-            {
-                Time = request.Time.ToUnixTimeSeconds(),
-                Value = request.Value
-            });
-
-            return Ok();
-        }
-
-        [HttpGet("all")]
-        public IActionResult GetAll()
-        {
-            _logger.LogDebug("GetAll : без параметров" );
-
-            var metrics = _repository.GetAll();
-
-            var response = new AllCpuMetricsResponse()
-            {
-                Metrics = new List<CpuMetricDto>()
-            };
-
-            foreach (var metric in metrics)
-            {
-                response.Metrics.Add(new CpuMetricDto { 
-                    Time = DateTimeOffset.FromUnixTimeSeconds(metric.Time), 
-                    Value = metric.Value, 
-                    Id = metric.Id 
-                });
-            }
-
-            return Ok(response);
-        }
-
+        /// <summary>
+        /// Получение CPU метрик в заданный промежуток времени.
+        /// </summary>
+        /// <param name="fromTime">Временная метка начала выборки.</param>
+        /// <param name="toTime">Временная метка окончания выборки.</param>
+        /// <returns>Список метрик в заданный интервал времени.</returns>
         [HttpGet("from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetrics([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
@@ -87,12 +52,28 @@ namespace MetricsAgent.Controllers
             return Ok(response);
         }
 
-        [HttpGet("from/{fromTime}/to/{toTime}/percentiles/{percentile}")]
-        public IActionResult GetMetricsByPercentile([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime, [FromRoute] Percentile percentile)
+        /// <summary>
+        /// Получение CPU метрик за все время учета.
+        /// </summary>
+        /// <returns>Список всех метрик.</returns>
+        [HttpGet("all")]
+        public IActionResult GetAll()
         {
-            _logger.LogDebug($"GetMetricsByPercentile : fromTime = {fromTime}; toTime = {toTime}; percentile = {percentile}");
+            _logger.LogDebug("GetAll : без параметров");
 
-            return Ok();
+            var metrics = _repository.GetAll();
+
+            var response = new AllCpuMetricsResponse()
+            {
+                Metrics = new List<CpuMetricDto>()
+            };
+
+            foreach (var metric in metrics)
+            {
+                response.Metrics.Add(_mapper.Map<CpuMetricDto>(metric));
+            }
+
+            return Ok(response);
         }
     }
 }

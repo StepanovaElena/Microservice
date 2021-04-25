@@ -4,6 +4,7 @@ using MetricsManager.DAL.Models;
 using MetricsManager.DAL.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace MetricsManager.Controllers
 {
@@ -23,6 +24,10 @@ namespace MetricsManager.Controllers
             _logger.LogInformation("NLog зарегистрирован в AgentsController");
         }
 
+        /// <summary>
+		/// Собирает информацию обо всех зарегистрированных агентах.
+		/// </summary>
+		/// <returns>Список всех зарегистрированных агентов.</returns>
         [HttpGet("read")]
         public IActionResult ReadRegisteredAgents()
         {
@@ -30,7 +35,10 @@ namespace MetricsManager.Controllers
 
             var allAgentsInfo = _repository.GetAllAgentsInfo();
 
-            var response = new AllAgentsInfoResponse();
+            var response = new AllAgentsInfoResponse()
+            {
+                Agents = new List<AgentInfoDto>()
+            };
 
             foreach (var agentInfo in allAgentsInfo)
             {
@@ -40,6 +48,11 @@ namespace MetricsManager.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Регистрация агента в базе.
+        /// </summary>
+        /// <param name="agentInfo">Запрос на добавление агента.</param>
+        /// <returns></returns>
         [HttpPost("register")]
         public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
         {
@@ -50,6 +63,11 @@ namespace MetricsManager.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Активация агента.
+        /// </summary>
+        /// <param name="agentId">Идентификатор агента.</param>
+        /// <returns></returns>
         [HttpPut("enable/{agentId}")]
         public IActionResult EnableAgentById([FromRoute] int agentId)
         {
@@ -57,6 +75,11 @@ namespace MetricsManager.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Диактивация агента.
+        /// </summary>
+        /// <param name="agentId">Идентификатор агента.</param>
+        /// <returns></returns>
         [HttpPut("disable/{agentId}")]
         public IActionResult DisableAgentById([FromRoute] int agentId)
         {
