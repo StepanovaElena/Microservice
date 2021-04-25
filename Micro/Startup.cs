@@ -9,9 +9,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace MetricsManager
 {
@@ -79,6 +83,35 @@ namespace MetricsManager
 			
 			services.AddHostedService<QuartzHostedService>();
 
+			services.AddSwaggerGen();
+
+			services.AddSwaggerGen(c =>
+			{
+				c.SwaggerDoc("v1", new OpenApiInfo
+				{
+					Version = "v1",
+					Title = "API сервиса Mенеджера сбора метрик",
+					Description = "Дополнительная информация",
+					TermsOfService = new Uri("https://example.com/terms"),
+					Contact = new OpenApiContact
+					{
+						Name = "...",
+						Email = string.Empty,
+						Url = new Uri("https://example.com"),
+					},
+					License = new OpenApiLicense
+					{
+						Name = "можно указать под какой лицензией все опубликовано",
+						Url = new Uri("https://example.com/license"),
+					}
+				});
+
+				// Указываем файл из которого брать комментарии для Swagger UI
+				var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+				var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+				c.IncludeXmlComments(xmlPath);
+			});
+
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -97,6 +130,14 @@ namespace MetricsManager
 
 			// запускаем миграции
 			migrationRunner.MigrateUp();
+
+			app.UseSwagger();
+
+			app.UseSwaggerUI(c =>
+			{
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "API сервиса менеджера сбора метрик");
+				c.RoutePrefix = string.Empty;
+			});
 
 			app.UseEndpoints(endpoints =>
             {
