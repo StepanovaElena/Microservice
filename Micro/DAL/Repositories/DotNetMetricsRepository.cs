@@ -59,11 +59,20 @@ namespace MetricsManager.DAL.Repositories
 
         public DateTimeOffset GetLast(int agentId)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            DateTimeOffset lastTime = DateTimeOffset.FromUnixTimeSeconds(0);
+
+            using var connection = new SQLiteConnection(ConnectionString);
+            try
             {
-                return connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM dotnetmetrics WHERE agentId = @agentId",
-                    new { agentId });
+                lastTime = connection.QueryFirst<DateTimeOffset>("SELECT MAX(Time) FROM dotnetmetrics WHERE agentId = @agentId",
+                 new { agentId });
             }
+            catch (Exception)
+            {
+                
+            }
+
+            return lastTime;
         }
 
         public DotNetMetric GetInTimePeriodPercentile(int agentId, DateTimeOffset timeStart, DateTimeOffset timeEnd, Percentile percentile)

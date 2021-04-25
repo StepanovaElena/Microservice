@@ -10,6 +10,10 @@ using Quartz.Spi;
 using MetricsAgent.Jobs;
 using Quartz;
 using Quartz.Impl;
+using Microsoft.OpenApi.Models;
+using System;
+using System.Reflection;
+using System.IO;
 
 namespace MetricsAgent
 {
@@ -77,6 +81,33 @@ namespace MetricsAgent
                 cronExpression: _cronExpression));
 
             services.AddHostedService<QuartzHostedService>();
+            
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "API сервиса агента сбора метрик",
+                    Description = "“ут можно поиграть с api нашего сервиса",
+                    TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "...",
+                        Email = string.Empty,
+                        Url = new Uri("https://example.com"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "можно указать под какой лицензией все опубликовано",
+                        Url = new Uri("https://example.com/license"),
+                    }
+                });
+
+                // ”казываем файл из которого брать комментарии дл€ Swagger UI
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });       
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,6 +126,14 @@ namespace MetricsAgent
 
             // запускаем миграции
             migrationRunner.MigrateUp();
+
+            app.UseSwagger();
+            
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API сервиса агента сбора метрик");
+                c.RoutePrefix = string.Empty;
+            });
 
             app.UseEndpoints(endpoints =>
             {

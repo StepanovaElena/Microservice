@@ -42,6 +42,8 @@ namespace MetricsManager.Jobs
             foreach (var agentInfo in allAgentsInfo)
             {
                 var last = _repository.GetLast(agentInfo.AgentId);
+                if (last == null) continue;
+
                 var request = new GetAllNetWorkMetricsApiRequest()
                 {
                     AgentUrl = agentInfo.AgentUrl,
